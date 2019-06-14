@@ -845,14 +845,13 @@ mdb_txn_begin env parent bReadOnly = mask_ $
 
     -- allow only one toplevel write operation at a time.
     when bLockForWrite (_lockEnv env) >>
+    let unlock = when bLockForWrite (_unlockEnv env) in
     let pEnv = _env_ptr env in
     let pParent = maybe nullPtr _txn_ptr parent in
     let iFlags = if bReadOnly then (#const MDB_RDONLY) else 0 in
-    let onFailure rc =
-            when bLockForWrite (_unlockEnv env) >>
-            _throwLMDBErrNum "mdb_txn_begin" rc
+    let onFailure rc = unlock >> _throwLMDBErrNum "mdb_txn_begin" rc
     in
-    alloca $ \ ppChildTxn ->
+    flip onException unlock $ alloca $ \ ppChildTxn ->
         _mdb_txn_begin pEnv pParent iFlags ppChildTxn >>= \ rc ->
         if (0 /= rc) then onFailure rc else
         peek ppChildTxn >>= \ pChildTxn ->
