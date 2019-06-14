@@ -38,10 +38,15 @@ module Database.LMDB.Raw
     ( LMDB_Version(..), lmdb_version, lmdb_dyn_version
     , LMDB_Error(..), MDB_ErrCode(..)
 
-    , MDB_env
+    , MDB_env(..)
     , MDB_dbi, MDB_dbi'
-    , MDB_txn, MDB_txnid
+    , MDB_txn(..), MDB_txnid
     , MDB_cursor, MDB_cursor'
+
+    -- FIXME: for temporary testing
+    , _lockEnv
+    , _unlockEnv
+    , _throwLMDBErrNum
 
     , MDB_val(..)
     , MDB_stat, ms_psize, ms_depth, ms_branch_pages, ms_leaf_pages, ms_overflow_pages, ms_entries
